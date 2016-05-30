@@ -23,7 +23,7 @@ public class AudioRecorder {
     private RecorderTask recorderTask = new RecorderTask();
     private AudioCallBack<BackResult> callBack;
     private Handler handler = new Handler();
-
+    private AudioRecord audioRecord;
     public enum BackResult {OK, ERROR}
 
     //    private AudioRecorder(File file){
@@ -54,6 +54,13 @@ public class AudioRecorder {
      */
     public void stopAudioRecording() {
         is_recording = false;
+        if (audioRecord != null) {
+            audioRecord.setRecordPositionUpdateListener(null);
+            audioRecord.stop();
+            audioRecord.release();
+            audioRecord = null;
+        }
+
     }
 
     class RecorderTask implements Runnable {
@@ -64,7 +71,7 @@ public class AudioRecorder {
         public void run() {
             //获取最小缓冲区大小
             int bufferSizeInBytes = AudioRecord.getMinBufferSize(SAMPLE_RATE, CHANNEL_CONFIG, AUDIO_FORMAT);
-            AudioRecord audioRecord = new AudioRecord(
+            audioRecord = new AudioRecord(
                     AUDIO_SOURCE,   //音频源
                     SAMPLE_RATE,    //采样率
                     CHANNEL_CONFIG,  //音频通道
@@ -103,12 +110,6 @@ public class AudioRecorder {
                     stopAudioRecording();
                     return;
                 }
-            }
-            if (audioRecord != null) {
-                audioRecord.setRecordPositionUpdateListener(null);
-                audioRecord.stop();
-                audioRecord.release();
-                audioRecord = null;
             }
 
 
