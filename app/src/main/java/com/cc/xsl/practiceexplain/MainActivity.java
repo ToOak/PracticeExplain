@@ -2,10 +2,13 @@ package com.cc.xsl.practiceexplain;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Service;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.PersistableBundle;
@@ -23,15 +26,20 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.cc.xsl.practiceexplain.utils.AudioRecorder;
+
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends Activity implements View.OnClickListener {
+    private String TAG = "oak_MainActivity";
     private static final int SPEECH_RECOGNIZE_CODE = 0x1010;
-    private Button btn_speechRecognize, btn_contact, btn_dial, btn_call;
+    private Button btn_speechRecognize, btn_contact, btn_dial, btn_call, btn_isAccessRecord, btn_isNetConnect;
     private TextView txt_recognised;
     private Intent intent;
     private Context context;
+    private AudioRecorder recorder;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -53,7 +61,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setFullscreen();
         setContentView(R.layout.activity_main);
-        Log.d("oak", "speecch_recognize_code:" + SPEECH_RECOGNIZE_CODE);
+        Log.d(TAG, "speecch_recognize_code:" + SPEECH_RECOGNIZE_CODE);
         context = MainActivity.this;
         setTitle("这里是title");//TODO 这里是title ? kitting me ??
         initViews();
@@ -75,9 +83,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
         btn_dial.setOnClickListener(this);
         btn_call.setOnClickListener(this);
         btn_contact.setOnClickListener(this);
+        btn_isAccessRecord.setOnClickListener(this);
+        btn_isNetConnect.setOnClickListener(this);
     }
 
     private void initViews() {
+        btn_isNetConnect = (Button) findViewById(R.id.btn_isNetConnect);
+        btn_isAccessRecord = (Button) findViewById(R.id.btn_isAccessRecord);
         btn_speechRecognize = (Button) findViewById(R.id.btn_speechRecognize);
         txt_recognised = (TextView) findViewById(R.id.txt_recognised);
         btn_contact = (Button) findViewById(R.id.btn_contact);
@@ -106,7 +118,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 break;
             }
             case R.id.btn_dial: {
-                startActivity(new Intent(Intent.ACTION_DIAL,Uri.parse("tel:1008611")));
+                startActivity(new Intent(Intent.ACTION_DIAL, Uri.parse("tel:1008611")));
                 break;
             }
             case R.id.btn_call: {
@@ -122,6 +134,35 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     return;
                 }
                 startActivity(new Intent(Intent.ACTION_CALL, Uri.parse("tel:1008611")));
+                break;
+            }
+            case R.id.btn_isAccessRecord:{
+                recorder = AudioRecorder.getInstance();
+                recorder.startAudioRecording(new AudioRecorder.AudioCallBack<AudioRecorder.BackResult>() {
+                    @Override
+                    public void onBack(AudioRecorder.BackResult result) {
+                        if (result == AudioRecorder.BackResult.OK){
+                            txt_recognised.setText("已获得录音权限");
+                        }else if (result == AudioRecorder.BackResult.ERROR){
+                            txt_recognised.setText("未获得录音权限");
+                        }
+                    }
+                });
+                break;
+            }
+            case R.id.btn_isNetConnect:{
+                ConnectivityManager cm = (ConnectivityManager) getSystemService(Service.CONNECTIVITY_SERVICE);
+                HashMap<String, Object> map = new HashMap<String, Object>();
+                if (cm != null) {
+                    NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+                    if (networkInfo != null && networkInfo.isConnected()) {
+                        txt_recognised.setText("net could connect ！");
+                    } else {
+                        txt_recognised.setText("net couldn't connect ！");
+                    }
+                } else {
+                    txt_recognised.setText( "can't get the status of the network");
+                }
                 break;
             }
         }
