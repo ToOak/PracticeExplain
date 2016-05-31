@@ -6,4 +6,5 @@
     <color name="lantern_on">#4fff</color>
     <color name="lantern_off">#4000</color>
     <color name="expand_child">#2222</color>
+    <color name="bg_popup">#60f0</color>
 </resources>
