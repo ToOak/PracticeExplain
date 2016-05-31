@@ -3,4 +3,7 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="lantern_on">#4fff</color>
+    <color name="lantern_off">#4000</color>
+    <color name="expand_child">#2222</color>
 </resources>

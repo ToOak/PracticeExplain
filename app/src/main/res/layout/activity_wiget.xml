@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <RelativeLayout
+        android:id="@+id/clock"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <AnalogClock
+            android:id="@+id/clock_analog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <DigitalClock
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/clock_analog"
+            android:id="@+id/clock_digital"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_toRightOf="@id/clock"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <Spinner
+            android:id="@+id/spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <AutoCompleteTextView
+            android:dropDownHorizontalOffset="50dp"
+            android:dropDownWidth="145dp"
+            android:completionHint="这里是下拉提示..."
+            android:completionThreshold="1"
+            android:id="@+id/auto_text"
+            android:layout_below="@id/spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+    <ScrollView
+        android:layout_below="@+id/clock"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <Button
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:id="@+id/btn_get_date"
+                android:text="get date and time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <DatePicker
+                android:layout_below="@id/btn_get_date"
+                android:id="@+id/dataPicker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <TimePicker
+                android:layout_below="@+id/dataPicker"
+                android:id="@+id/timePicker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </RelativeLayout>
+    </ScrollView>
+
+</RelativeLayout>

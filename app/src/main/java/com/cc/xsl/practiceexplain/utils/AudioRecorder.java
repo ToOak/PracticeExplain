@@ -89,7 +89,8 @@ public class AudioRecorder {
 
 //                判断是否读取成功
 //                if (bufferReadResult == AudioRecord.ERROR_BAD_VALUE || bufferReadResult == AudioRecord.ERROR_INVALID_OPERATION) {
-                if (bufferReadResult < 0){
+//                if (bufferReadResult < 0){
+                if (bufferReadResult != 2048){
                     Log.e(TAG, "没有权限");
                     handler.post(new Runnable() {
                         @Override
@@ -111,14 +112,10 @@ public class AudioRecorder {
                     return;
                 }
             }
-
-
         }
     }
 
     public interface AudioCallBack<T> {
         void onBack(T result);
     }
-
-
 }

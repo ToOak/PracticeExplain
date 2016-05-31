@@ -1,6 +1,7 @@
 package com.cc.xsl.practiceexplain;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Service;
 import android.content.ActivityNotFoundException;
@@ -10,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.os.PersistableBundle;
 import android.speech.RecognizerIntent;
@@ -23,8 +25,13 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.LinearLayout;
+import android.widget.RatingBar;
+import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.cc.xsl.practiceexplain.utils.AudioRecorder;
 
@@ -40,6 +47,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private Intent intent;
     private Context context;
     private AudioRecorder recorder;
+    private ToggleButton btn_toggle_lantern;
+    private LinearLayout parent;
+    private RatingBar ratingBar;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -79,15 +89,48 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     private void viewEvents() {
+        findViewById(R.id.btn_go2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, WidgetActivity.class));
+            }
+        });
+        findViewById(R.id.btn_go3).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, TabHostActivity.class));
+            }
+        });
+        ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+            @Override
+            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+                int numStars = ratingBar.getNumStars();
+                Toast.makeText(MainActivity.this,numStars+" : "+rating,Toast.LENGTH_SHORT).show();
+            }
+        });
         btn_speechRecognize.setOnClickListener(this);
         btn_dial.setOnClickListener(this);
         btn_call.setOnClickListener(this);
         btn_contact.setOnClickListener(this);
         btn_isAccessRecord.setOnClickListener(this);
         btn_isNetConnect.setOnClickListener(this);
+        btn_toggle_lantern.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @TargetApi(Build.VERSION_CODES.M)
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked){
+                    parent.setBackgroundColor(getResources().getColor(R.color.lantern_on));
+                }else {
+                    parent.setBackgroundColor(getResources().getColor(R.color.lantern_off));
+                }
+            }
+        });
     }
 
     private void initViews() {
+        ratingBar = (RatingBar) findViewById(R.id.ratingbar);
+        parent = (LinearLayout) findViewById(R.id.parent);
+        btn_toggle_lantern = (ToggleButton) findViewById(R.id.btn_toggle_lantern);
         btn_isNetConnect = (Button) findViewById(R.id.btn_isNetConnect);
         btn_isAccessRecord = (Button) findViewById(R.id.btn_isAccessRecord);
         btn_speechRecognize = (Button) findViewById(R.id.btn_speechRecognize);
