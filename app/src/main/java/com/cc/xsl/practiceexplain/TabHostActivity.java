@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.Adapter;
 import android.widget.Button;
 import android.widget.ExpandableListView;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.PopupWindow;
@@ -19,6 +20,8 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.TabHost;
 import android.widget.Toast;
+
+import com.cc.xsl.practiceexplain.view.TouchView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,6 +57,7 @@ public class TabHostActivity extends TabActivity{
         tabHost.addTab(tabHost.newTabSpec("three").setIndicator("③").setContent(R.id.parent_three));
     }
     private void initViews(){
+        ((LinearLayout)findViewById(R.id.touch_view)).addView(new TouchView(TabHostActivity.this));
         expandableListView = (ExpandableListView) findViewById(R.id.expandablelist);
         initListview();
         btn_popup = (Button) findViewById(R.id.btn_popup);

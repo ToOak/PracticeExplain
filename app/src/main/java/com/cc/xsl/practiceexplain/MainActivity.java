@@ -8,6 +8,9 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -20,20 +23,26 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AbsoluteLayout;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
+import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.cc.xsl.practiceexplain.utils.AudioRecorder;
+import com.cc.xsl.practiceexplain.view.TouchView;
 
 import java.io.File;
 import java.util.HashMap;
@@ -50,6 +59,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private ToggleButton btn_toggle_lantern;
     private LinearLayout parent;
     private RatingBar ratingBar;
+    private int xSpan = 0;
+    private int ySpan = 0;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -76,6 +87,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         setTitle("这里是title");//TODO 这里是title ? kitting me ??
         initViews();
         viewEvents();
+//        this.addContentView(new TouchView(this),new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
     }
 
     /**
@@ -105,7 +117,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             @Override
             public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
                 int numStars = ratingBar.getNumStars();
-                Toast.makeText(MainActivity.this,numStars+" : "+rating,Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, numStars + " : " + rating, Toast.LENGTH_SHORT).show();
             }
         });
         btn_speechRecognize.setOnClickListener(this);
@@ -118,11 +130,38 @@ public class MainActivity extends Activity implements View.OnClickListener {
             @TargetApi(Build.VERSION_CODES.M)
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked){
+                if (isChecked) {
                     parent.setBackgroundColor(getResources().getColor(R.color.lantern_on));
-                }else {
+                } else {
                     parent.setBackgroundColor(getResources().getColor(R.color.lantern_off));
                 }
+            }
+        });
+
+        findViewById(R.id.txt_touch).setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()){
+                    case MotionEvent.ACTION_DOWN:{
+                        xSpan = (int) event.getX();
+                        ySpan = (int) event.getY();
+                        break;
+                    }
+                    case MotionEvent.ACTION_MOVE:{
+                        TextView newText = (TextView) findViewById(R.id.txt_touch);
+                        int rawX = (int) event.getX();
+                        int rawY = (int) event.getY();
+                        ViewGroup.LayoutParams mLP = new AbsoluteLayout.LayoutParams(
+                                LinearLayout.LayoutParams.WRAP_CONTENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT,
+                                rawX - xSpan,
+                                rawY - ySpan
+                        );
+                        newText.setLayoutParams(mLP);
+                        break;
+                    }
+                }
+                return true;
             }
         });
     }
@@ -209,5 +248,51 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 break;
             }
         }
+    }
+
+    /**
+     * 关于回调方法   接口KeyEvent.Callback中抽象方法
+     * @param keyCode
+     * @param event
+     * @return
+     */
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        Log.d(TAG,"onkeyDown---keycode: "+keyCode+"\tkeyevent: "+event);
+        // 按下home键，log没有打印
+        // keycode: 82	keyevent: KeyEvent { action=ACTION_DOWN, keyCode=KEYCODE_MENU, scanCode=139, metaState=0, flags=0x8, repeatCount=0, eventTime=7126985, downTime=7126985, deviceId=3, source=0x101 }
+        // keycode: 4	keyevent: KeyEvent { action=ACTION_DOWN, keyCode=KEYCODE_BACK, scanCode=158, metaState=0, flags=0x8, repeatCount=0, eventTime=7102213, downTime=7102213, deviceId=3, source=0x101 }
+        return super.onKeyDown(keyCode, event);
+        // 返回true与false的区别
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        Log.d(TAG,"onkeyUp---keycode: "+keyCode+"\tkeyevent: "+event);
+        return super.onKeyUp(keyCode, event);
+    }
+
+    @Override
+    public boolean onKeyLongPress(int keyCode, KeyEvent event) {
+        Log.d(TAG,"onKeyLongPress---keycode: "+keyCode+"\tkeyevent: "+event);
+        return super.onKeyLongPress(keyCode, event);
+    }
+
+    @Override
+    public boolean onKeyMultiple(int keyCode, int repeatCount, KeyEvent event) {
+        Log.d(TAG,"onKeyMultiple---keycode: "+keyCode+"\tkeyevent: "+event);
+        return super.onKeyMultiple(keyCode, repeatCount, event);
+    }
+
+    @Override
+    public boolean onKeyShortcut(int keyCode, KeyEvent event) {
+        Log.d(TAG,"onKeyShortcut---keycode: "+keyCode+"\tkeyevent: "+event);
+        return super.onKeyShortcut(keyCode, event);
+    }
+
+    @Override
+    public boolean onTrackballEvent(MotionEvent event) {
+        Log.d(TAG,"onTrackballEvent---keyevent: "+event);
+        return super.onTrackballEvent(event);
     }
 }
