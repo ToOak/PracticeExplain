@@ -8,6 +8,9 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -45,6 +48,7 @@ import com.cc.xsl.practiceexplain.utils.AudioRecorder;
 import com.cc.xsl.practiceexplain.view.TouchView;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -59,6 +63,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private ToggleButton btn_toggle_lantern;
     private LinearLayout parent;
     private RatingBar ratingBar;
+    private Configuration cfg;
     private int xSpan = 0;
     private int ySpan = 0;
 
@@ -81,6 +86,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setFullscreen();
+//        if (ActivityCompat.checkSelfPermission(this,Manifest.permission.SET_WALLPAPER) == PackageManager.PERMISSION_GRANTED) {
+//            try {
+//                setWallpaper(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher));
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
         setContentView(R.layout.activity_main);
         Log.d(TAG, "speecch_recognize_code:" + SPEECH_RECOGNIZE_CODE);
         context = MainActivity.this;
@@ -167,6 +179,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     private void initViews() {
+        cfg = getResources().getConfiguration();
         ratingBar = (RatingBar) findViewById(R.id.ratingbar);
         parent = (LinearLayout) findViewById(R.id.parent);
         btn_toggle_lantern = (ToggleButton) findViewById(R.id.btn_toggle_lantern);
@@ -294,5 +307,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
     public boolean onTrackballEvent(MotionEvent event) {
         Log.d(TAG,"onTrackballEvent---keyevent: "+event);
         return super.onTrackballEvent(event);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        Log.d(TAG,"onConfigurationChanged---newConfig: "+newConfig);
+        super.onConfigurationChanged(newConfig);
     }
 }

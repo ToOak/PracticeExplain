@@ -1,9 +1,16 @@
 package com.cc.xsl.practiceexplain;
 
 import android.app.TabActivity;
+import android.content.ContentResolver;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.Contacts;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -19,27 +26,50 @@ import android.widget.PopupWindow;
 import android.widget.SimpleCursorAdapter;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.TabHost;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.cc.xsl.practiceexplain.utils.ConfigurationUtil;
 import com.cc.xsl.practiceexplain.view.TouchView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.locks.Condition;
 
 /**
  * Created by xushuailong on 2016/5/31.
  */
 public class TabHostActivity extends TabActivity{
     private String TAG = "oak_TabHostActivity";
+    private static final int COUNTDOWN = 0;
     private TabHost tabHost;
     private ExpandableListView expandableListView;
     private List<Map<String, String>> groups;
     private List<List<Map<String, Object>>> childs;
     private SimpleExpandableListAdapter adapter;
-    private Button btn_popup, btn_open, btn_save, btn_close;
+    private Button btn_popup;
     private PopupWindow popup;
+    private ConfigurationUtil cfu;
+    private Configuration cfg;
+    private int timer = 60;
+    private Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if (msg.what == COUNTDOWN){
+                if (timer <= 0 ){
+                    timer = 60;
+                }else {
+                    timer--;
+                }
+                ((TextView)findViewById(R.id.txt_timer)).setText(timer + "s");
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +91,69 @@ public class TabHostActivity extends TabActivity{
         expandableListView = (ExpandableListView) findViewById(R.id.expandablelist);
         initListview();
         btn_popup = (Button) findViewById(R.id.btn_popup);
+        init2View();
+    }
+
+    private void init2View() {
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Message msg = new Message();
+                msg.what = COUNTDOWN;
+                handler.sendMessage(msg);
+            }
+        },0,1000);
+        if (cfu == null) {
+            cfu = ConfigurationUtil.getInstance(TabHostActivity.this);
+        }
+        cfu.setTextViewInfo((ViewGroup) findViewById(R.id.parent_two));
+        findViewById(R.id.btn_change_config).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cfg = TabHostActivity.this.getResources().getConfiguration();
+                if (cfg.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    TabHostActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                } else if (cfg.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                    TabHostActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                }
+            }
+        });
+        query();
+    }
+
+    private void query() {
+        ContentResolver resolver = getContentResolver();
+        Uri uri = ContactsContract.Contacts.CONTENT_URI;
+        Cursor cursor = resolver.query(uri,null,null,null,null);
+        if (cursor.moveToFirst()){
+            do {
+                Log.d(TAG,"******************");
+                String contactId  = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+                String displayName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+                int phoneCount = cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
+                Log.d(TAG,"contactId: " + contactId + "\tdisplayname: " + displayName + "\tphoneCount: " + phoneCount);
+                if (phoneCount > 0){
+                    Cursor phones = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                            null,ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " +contactId,null,null);
+                    if (phones.moveToFirst()){
+                        do {
+                            String number = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                            Log.d(TAG,"number: " + number);
+                        }while (phones.moveToNext());
+                    }
+                }
+            }while (cursor.moveToNext());
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Log.d(TAG, "onConfigurationChanged---newConfig: " + newConfig);
+        if (cfu == null){
+            cfu = ConfigurationUtil.getInstance(TabHostActivity.this);
+        }
+        cfu.setTextViewInfo((ViewGroup) findViewById(R.id.parent_two));
     }
 
     private void initListview() {
