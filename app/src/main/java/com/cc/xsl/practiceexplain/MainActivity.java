@@ -17,8 +17,10 @@ import android.graphics.Paint;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Parcelable;
 import android.os.PersistableBundle;
 import android.speech.RecognizerIntent;
 import android.support.v4.app.ActivityCompat;
@@ -64,6 +66,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private LinearLayout parent;
     private RatingBar ratingBar;
     private Configuration cfg;
+    private Bitmap bitmap;
     private int xSpan = 0;
     private int ySpan = 0;
 
@@ -99,7 +102,26 @@ public class MainActivity extends Activity implements View.OnClickListener {
         setTitle("这里是title");//TODO 这里是title ? kitting me ??
         initViews();
         viewEvents();
+        initSetShortcut();
 //        this.addContentView(new TouchView(this),new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+    }
+
+    private void initSetShortcut() {
+        bitmap = BitmapFactory.decodeResource(getResources(),R.mipmap.launcher_0);
+        final Intent shortCutIntent = new Intent("com.android.launcher.action.INSTALL_SHORTCUT");
+        String title = "自定义Shortcut";
+        Parcelable icon = Intent.ShortcutIconResource.fromContext(this,R.mipmap.launcher_0);
+//        Intent appIntent = new Intent(MainActivity.this,WidgetActivity.class);
+        Intent appIntent = new Intent("android.intent.shortcut.TO_WIDGETACTIVITY");
+        shortCutIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME,title);
+        shortCutIntent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,icon);
+        shortCutIntent.putExtra(Intent.EXTRA_SHORTCUT_INTENT,appIntent);
+        findViewById(R.id.btn_addshortcut).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MainActivity.this.sendBroadcast(shortCutIntent);
+            }
+        });
     }
 
     /**

@@ -28,6 +28,12 @@
             android:layout_alignParentRight="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
+        <Button
+            android:text="添加快捷方式"
+            android:layout_toLeftOf="@id/btn_toggle_lantern"
+            android:id="@+id/btn_addshortcut"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
     </RelativeLayout>
     <TextView
         android:id="@+id/txt_recognised"
